@@ -4,6 +4,7 @@ import de.axelspringer.ideas.team.mood.mail.MailSender;
 import de.axelspringer.ideas.team.mood.mail.MailTemplate;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodResponse;
+import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodValue;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -64,15 +65,35 @@ public class TeamMoodApplication {
         public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
             LOG.info("HelloJob executed");
 
-            TeamMoodResponse teamMoodResponse = teamMood.loadTeamMoodForLastSevenDays("01770399-e272-4032-ad1e-c96e0dc90e58");
-            LOG.info("Loaded data from TeamMood for team '{}'", teamMoodResponse.teamName);
+            String innerValue = "";
 
-            String innerValue = teamMoodResponse.teamName;
+            for (String apiKey : teamMoodProperties.getTeamApiKeys()) {
+                TeamMoodResponse teamMoodResponse = teamMood.loadTeamMoodForLastSevenDays(apiKey);
+                LOG.info("Loaded data from TeamMood for team '{}'", teamMoodResponse.teamName);
+
+                String content = "";
+                for (TeamMoodValue value : teamMoodResponse.getAllValuesSorted()) {
+                    content += MailTemplate.fromClasspath("_mood.html",
+                            param("mood", value.mood.name()),
+                            param("text", value.comment),
+                            param("hexColor", value.mood.hexColor)
+                    );
+                }
+
+                innerValue += MailTemplate.fromClasspath("_team.html",
+                        param("url", "https://app.teammood.com/app#/" + apiKey + "/calendar"),
+                        param("team", teamMoodResponse.teamName),
+                        param("content", content)
+                );
+            }
+
             String body = MailTemplate.fromClasspath("email.html",
-                    param("asdf", innerValue),
-                    param("title", "TeamMood "));
+                    param("title", "TeamMood for Ideas: KW" + getCalendarWeek()),
+                    param("content", innerValue)
+            );
             String subject = "TeamMood for Ideas: KW" + getCalendarWeek();
             mailSender.send("sebastian.waschnick@asideas.de", subject, body);
+//            mailSender.send("ard.weiher@asideas.de", subject, body);
         }
 
         private String getCalendarWeek() {

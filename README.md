@@ -9,4 +9,3 @@
 * de.axelspringer.ideas.team.mood.mail.user
 * de.axelspringer.ideas.team.mood.mail.password
 * de.axelspringer.ideas.team.mood.api.keys
-          }

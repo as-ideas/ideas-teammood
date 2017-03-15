@@ -1,5 +1,6 @@
 package de.axelspringer.ideas.team.mood.mail;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
 import java.util.Properties;
 
 public class MailSender {
@@ -22,6 +24,14 @@ public class MailSender {
     public MailSender(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public void writeToFile(String receiverEmail, String subject, String htmlBody) {
+        try {
+            FileUtils.writeStringToFile(new File("/Users/swaschni/Projekte/ideas-teammood/target/mail.html"), htmlBody);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public void send(String receiverEmail, String subject, String htmlBody) {
