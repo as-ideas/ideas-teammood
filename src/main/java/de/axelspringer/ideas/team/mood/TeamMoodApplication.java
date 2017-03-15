@@ -5,12 +5,12 @@ import de.axelspringer.ideas.team.mood.mail.MailTemplate;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodResponse;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodValue;
+import org.quartz.DateBuilder;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
-import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Calendar;
 import java.util.Date;
 
+import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
 
@@ -37,12 +38,15 @@ public class TeamMoodApplication {
 
         JobDetail jobDetail = newJob(HelloJob.class).build();
 
-        Trigger trigger = newTrigger()
-                .startNow()
-                .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever())
-                .build();
+        scheduler.scheduleJob(jobDetail, trigger());
+    }
 
-        scheduler.scheduleJob(jobDetail, trigger);
+    private static Trigger trigger() {
+        return newTrigger()
+                .withIdentity("weekklySaturdayTrigger", "group1")
+                .startNow()
+                .withSchedule(weeklyOnDayAndHourAndMinute(DateBuilder.SATURDAY, 11, 0)) // fire every saturday at 11:00
+                .build();
     }
 
     private static void checkParameters() {
