@@ -3,18 +3,17 @@
 <head>
     <meta name="viewport" content="width=device-width"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>{title}</title>
+    <title>{{title}}</title>
 </head>
-
-<body class="" style="background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;">
+<body class="" style="background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;word-wrap: break-word;word-break: break-all;">
 <table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate;mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 100%;background-color: #f6f6f6;">
     <tr>
         <td style="font-family: sans-serif;font-size: 14px;vertical-align: top;">&nbsp;</td>
-        <td class="container" style="font-family: sans-serif;font-size: 14px;vertical-align: top;display: block;max-width: 580px;padding: 10px;width: 580px;margin: 0 auto !important;">
+        <td class="container" style="font-family: sans-serif;font-size: 14px;vertical-align: top;display: block;max-width: 580px;padding: 10px;width: 100%;margin: 0 auto !important;">
             <div class="content" style="box-sizing: border-box;display: block;margin: 0 auto;max-width: 580px;padding: 10px;">
 
                 <!-- START CENTERED WHITE CONTAINER -->
-                <span class="preheader" style="color: transparent;display: none;height: 0;max-height: 0;max-width: 0;opacity: 0;overflow: hidden;mso-hide: all;visibility: hidden;width: 0;">{title}</span>
+                <span class="preheader" style="color: transparent;display: none;height: 0;max-height: 0;max-width: 0;opacity: 0;overflow: hidden;mso-hide: all;visibility: hidden;width: 0;">{{title}}</span>
                 <table class="main" style="border-collapse: separate;mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 100%;background: #fff;border-radius: 3px;">
 
                     <!-- START MAIN CONTENT AREA -->
@@ -24,7 +23,7 @@
                                 <tr>
                                     <td style="font-family: sans-serif;font-size: 14px;vertical-align: top;">
                                         <h1 style="color: #000000;font-family: sans-serif;font-weight: 300;line-height: 1.4;margin: 0;margin-bottom: 30px;font-size: 35px;text-align: center;text-transform: capitalize;">Hey IDEAS,</h1>
-                                        <p style="font-family: sans-serif;font-size: 14px;font-weight: normal;margin: 0;margin-bottom: 15px;">sometimes you just want to see all the comments once a week in one place. This is it.</p>
+                                        <p style="font-family: sans-serif;font-size: 14px;font-weight: normal;margin: 0;margin-bottom: 15px;">sometimes you just want to see all the comments once a week in one place. This is it: Your summary from Monday, the {{start}} to Friday, the {{end}}.</p>
                                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate;mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 100%;box-sizing: border-box;">
                                             <tbody>
                                             <tr>
@@ -43,7 +42,53 @@
                                             </tbody>
                                         </table>
 
-                                        {content}
+                                        <!-- START Company Summary -->
+                                        <span>Overall Average Mood: {{averageMood}} / 4</span>
+                                        <br />
+                                        <span>Overall Participation: {{participation}}</span>
+                                        <br />
+                                        <!-- END Company Summary -->
+
+                                        <!-- START TEAMS -->
+                                        {{#each teams}}
+                                            <!-- Start TEAM -->
+                                            <br/>
+                                            <h2 style="color: #000000;font-family: sans-serif;font-weight: 400;line-height: 1.4;margin: 0;margin-bottom: 30px;">{{teamName}}</h2>
+                                            <span>Average Mood: {{averageMood}} / 4</span>
+                                            <br />
+                                            <span>Participation: {{participation}}</span>
+                                            <br />
+                                            <a href="{{url}}" style="color: #1abc9c;text-decoration: underline;">Find more for the team directly at TeamMood!</a>
+
+<table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate;mso-table-lspace: 0pt;mso-table-rspace: 0pt;width: 100%;box-sizing: border-box;"><tbody>
+                                            {{#each allValuesSorted}}
+                                                <!-- Start Mood -->
+
+                                                    <tr><td>
+
+                                                <div class="mood {{mood}}" style="margin: 4px;padding: 6px;width: 100%;min-height: 30px;line-height: 24px;background: {{hexColor}}">
+                                                    <span class="mood-image" style="position: relative;display: inline-block;width: 44px;max-width: 44px;">
+                                                        <img src="http://waschnick.de/images/{{mood}}.png" width="44px" style="width: 44px;max-width: 44px;height: auto;">
+                                                    </span>
+                                                    <span>
+                                                        &nbsp;&nbsp;
+                                                    </span>
+                                                    <span class="mood-text" style="max-width: 436px;position: relative;display: inline-block;">
+                                                        {{comment}}
+                                                    </span>
+                                                    <br />
+                                                    <span>{{formattedDate}}</span>
+                                                </div>
+
+                                                </td></tr>
+                                                <!-- End Mood -->
+                                            {{/each}}
+                                            </tbody></table>
+
+                                            <br/>
+                                            <!-- END TEAM -->
+                                        {{/each}}
+                                        <!-- END TEAMS -->
                                     </td>
                                 </tr>
                             </table>

@@ -1,10 +1,11 @@
 package de.axelspringer.ideas.team.mood;
 
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+import de.axelspringer.ideas.team.mood.mail.MailContent;
 import de.axelspringer.ideas.team.mood.mail.MailSender;
-import de.axelspringer.ideas.team.mood.mail.MailTemplate;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
-import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodResponse;
-import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodValue;
+import de.axelspringer.ideas.team.mood.moods.entity.Team;
 import org.quartz.DateBuilder;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -16,6 +17,12 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -27,10 +34,10 @@ public class TeamMoodApplication {
 
     private final static Logger LOG = LoggerFactory.getLogger(TeamMoodApplication.class);
 
-//    private final static LocDatT
-
     public static void main(String[] args) throws Exception {
         checkParameters();
+
+        new HelloJob().execute(null);
 
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 
@@ -50,54 +57,61 @@ public class TeamMoodApplication {
     }
 
     private static void checkParameters() {
-        // TODO
+        // TODO Should not start if parameters are missing
     }
 
     public static class HelloJob implements Job {
 
+        private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
         private final TeamMood teamMood;
         private final MailSender mailSender;
         private final TeamMoodProperties teamMoodProperties;
+        private final Handlebars handlebars;
+        private final Template emailTemplate;
 
         public HelloJob() {
             this.teamMoodProperties = TeamMoodProperties.INSTANCE;
             this.mailSender = new MailSender(this.teamMoodProperties.getUsername(), this.teamMoodProperties.getPassword());
             this.teamMood = new TeamMood();
+            this.handlebars = new Handlebars();
+
+            try {
+                emailTemplate = handlebars.compile("email");
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
         }
 
         @Override
         public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-            LOG.info("HelloJob executed");
+            LOG.info("START TeamMood mail sending");
+            try {
 
-            String innerValue = "";
+                MailContent emailContent = new MailContent();
+                emailContent.title = "TeamMood for Ideas: KW" + getCalendarWeek();
+                emailContent.teams = new ArrayList<>();
+                emailContent.start = start();
+                emailContent.end = end();
 
-            for (String apiKey : teamMoodProperties.getTeamApiKeys()) {
-                TeamMoodResponse teamMoodResponse = teamMood.loadTeamMoodForLastSevenDays(apiKey);
-                LOG.info("Loaded data from TeamMood for team '{}'", teamMoodResponse.teamName);
-
-                String content = "";
-                for (TeamMoodValue value : teamMoodResponse.getAllValuesSorted()) {
-                    content += MailTemplate.fromClasspath("_mood.html",
-                            param("mood", value.mood.name()),
-                            param("text", value.comment),
-                            param("hexColor", value.mood.hexColor)
-                    );
+                for (String apiKey : teamMoodProperties.getTeamApiKeys()) {
+                    Team team = teamMood.loadTeamMoodForLastSevenDays(apiKey);
+                    emailContent.teams.add(team);
                 }
 
-                innerValue += MailTemplate.fromClasspath("_team.html",
-                        param("url", "https://app.teammood.com/app#/" + apiKey + "/calendar"),
-                        param("team", teamMoodResponse.teamName),
-                        param("content", content)
-                );
-            }
+                String subject = "TeamMood for Ideas: KW" + getCalendarWeek();
 
-            String body = MailTemplate.fromClasspath("email.html",
-                    param("title", "TeamMood for Ideas: KW" + getCalendarWeek()),
-                    param("content", innerValue)
-            );
-            String subject = "TeamMood for Ideas: KW" + getCalendarWeek();
-            mailSender.send("sebastian.waschnick@asideas.de", subject, body);
-//            mailSender.send("ard.weiher@asideas.de", subject, body);
+
+                String htmlBody = emailTemplate.apply(emailContent);
+//                FileUtils.writeStringToFile(new File("~/ideas-teammood/target/mail.html"), htmlBody);
+                for (String mailAddress : teamMoodProperties.getEmailAddresses()) {
+                    mailSender.send(mailAddress, subject, htmlBody);
+                }
+
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            LOG.info("END TeamMood mail sending");
         }
 
         private String getCalendarWeek() {
@@ -106,8 +120,12 @@ public class TeamMoodApplication {
             return "" + cal.get(Calendar.WEEK_OF_YEAR);
         }
 
-        private MailTemplate.ViewParameter param(String key, String innerValue) {
-            return new MailTemplate.ViewParameter(key, innerValue);
+        private String start() {
+            return dateTimeFormatter.format(LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.MONDAY)));
+        }
+
+        private String end() {
+            return dateTimeFormatter.format(LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)));
         }
 
 

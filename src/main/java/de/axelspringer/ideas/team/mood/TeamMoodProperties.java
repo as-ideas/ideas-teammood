@@ -13,6 +13,8 @@ public class TeamMoodProperties {
 
     private List<String> teamApiKeys;
 
+    private List<String> emails;
+
     public String getUsername() {
         if (username == null) {
             username = System.getProperty("de.axelspringer.ideas.team.mood.mail.user");
@@ -32,5 +34,12 @@ public class TeamMoodProperties {
             teamApiKeys = Arrays.asList(System.getProperty("de.axelspringer.ideas.team.mood.api.keys").split(","));
         }
         return teamApiKeys;
+    }
+
+    public List<String> getEmailAddresses() {
+        if (emails == null) {
+            emails = Arrays.asList(System.getProperty("de.axelspringer.ideas.team.mood.email.addresses").split(","));
+        }
+        return emails;
     }
 }
