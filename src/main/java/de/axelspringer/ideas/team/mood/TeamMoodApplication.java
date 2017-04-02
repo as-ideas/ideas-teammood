@@ -37,7 +37,7 @@ public class TeamMoodApplication {
     public static void main(String[] args) throws Exception {
         checkParameters();
 
-        new HelloJob().execute(null);
+        // new HelloJob().execute(null);
 
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 
