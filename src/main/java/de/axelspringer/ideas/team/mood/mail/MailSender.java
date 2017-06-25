@@ -34,6 +34,39 @@ public class MailSender {
         }
     }
 
+    public void sendViaMailgun(String receiverEmail, String subject, String htmlBody) {
+        try {
+            log.info("Sending mail with MailGun to: " + receiverEmail);
+
+            Properties props = new Properties();
+
+            props.put("mail.smtp.starttls.enable", true); // added this line
+            props.put("mail.smtp.auth", true);
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "587");
+
+            Session session = Session.getInstance(props,
+                    new javax.mail.Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(username, password);
+                        }
+                    });
+
+            MimeMessage message = new MimeMessage(session);
+
+            message.setFrom(new InternetAddress("Axel Springer Ideas Engineering <hello@asideas.de>"));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverEmail));
+            message.setSubject(subject);
+            message.setContent(htmlBody, "text/html; charset=utf-8");
+
+            log.info("Sending mail...");
+            Transport.send(message);
+            log.info("Done.");
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     public void send(String receiverEmail, String subject, String htmlBody) {
         try {
             log.info("Sending mail to: " + receiverEmail);

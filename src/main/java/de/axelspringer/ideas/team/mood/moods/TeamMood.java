@@ -1,6 +1,7 @@
 package de.axelspringer.ideas.team.mood.moods;
 
 import com.google.gson.Gson;
+import de.axelspringer.ideas.team.mood.TeamMoodHttpClientFactory;
 import de.axelspringer.ideas.team.mood.moods.entity.OneMoodValue;
 import de.axelspringer.ideas.team.mood.moods.entity.ParticipationResponse;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
@@ -10,7 +11,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class TeamMood {
     public Team loadTeamMoodForLastSevenDays(String teamApiKey) {
         LOG.info("Loading data from TeamMood!");
         try {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpClient httpclient = getaDefault();
             HttpGet httpGet = new HttpGet(String.format(URL_TO_TEAM_MOOD_WITH_PLACEHOLDER, teamApiKey));
 
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
@@ -62,6 +62,10 @@ public class TeamMood {
         }
     }
 
+    private CloseableHttpClient getaDefault() {
+       return new TeamMoodHttpClientFactory().init();
+    }
+
     private LocalDateTime epochMilisToLocalDateTime(TeamMoodDay day) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(day.nativeDate), ZoneId.of("Europe/Berlin"));
     }
@@ -69,7 +73,7 @@ public class TeamMood {
     public Integer loadNumberOfMembers(String teamApiKey) {
         LOG.info("Loading participation from TeamMood!");
         try {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
+            CloseableHttpClient httpclient = getaDefault();
             HttpGet httpGet = new HttpGet(String.format(URL_TO_PARTICIPATION_WITH_PLACEHOLDER, teamApiKey));
 
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {

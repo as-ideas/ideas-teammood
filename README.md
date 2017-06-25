@@ -12,3 +12,8 @@
 
 ## E-Mail Template 
 https://github.com/leemunroe/responsive-html-email-template
+
+# Let's Encrypt
+
+keytool -keystore letsencrypt-truststore -alias isrgrootx -importcert -file letsencrypt.cer
+keytool -keystore letsencrypt-truststore -alias identrust -importcert -file identrust.cer

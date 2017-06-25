@@ -5,21 +5,21 @@ import de.axelspringer.ideas.team.mood.moods.entity.Team;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodDay;
 
 import java.text.DecimalFormat;
-import java.util.List;
+import java.util.Collection;
 
 public class MailContent {
 
     public String title;
     public String start;
     public String end;
-    public List<Team> teams;
+    public Collection<Team> teams;
 
 
     public String getTitle() {
         return title;
     }
 
-    public List<Team> getTeams() {
+    public Collection<Team> getTeams() {
         return teams;
     }
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Team {
+public class Team implements Comparable<Team> {
 
     public String id;
     public String teamName;
@@ -63,5 +63,10 @@ public class Team {
 
     public TeamMoodDay[] getDays() {
         return days;
+    }
+
+    @Override
+    public int compareTo(Team o) {
+        return this.id.compareTo(o.id);
     }
 }

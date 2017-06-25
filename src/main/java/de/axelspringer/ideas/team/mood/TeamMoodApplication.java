@@ -12,20 +12,16 @@ import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.concurrent.ConcurrentSkipListSet;
 
+import static de.axelspringer.ideas.team.mood.TeamMoodWeek.getCalendarWeek;
 import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -35,16 +31,16 @@ public class TeamMoodApplication {
     private final static Logger LOG = LoggerFactory.getLogger(TeamMoodApplication.class);
 
     public static void main(String[] args) throws Exception {
-        checkParameters();
+        //new HelloJob().execute(null);
+        new TeamMoodController().init();
+        startScheduler();
+    }
 
-        // new HelloJob().execute(null);
-
+    private static void startScheduler() throws SchedulerException {
         Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-
         scheduler.start();
 
         JobDetail jobDetail = newJob(HelloJob.class).build();
-
         scheduler.scheduleJob(jobDetail, trigger());
     }
 
@@ -56,13 +52,8 @@ public class TeamMoodApplication {
                 .build();
     }
 
-    private static void checkParameters() {
-        // TODO Should not start if parameters are missing
-    }
-
     public static class HelloJob implements Job {
 
-        private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
         private final TeamMood teamMood;
         private final MailSender mailSender;
@@ -77,7 +68,7 @@ public class TeamMoodApplication {
             this.handlebars = new Handlebars();
 
             try {
-                emailTemplate = handlebars.compile("email");
+                emailTemplate = handlebars.compile("templates/email");
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -90,14 +81,14 @@ public class TeamMoodApplication {
 
                 MailContent emailContent = new MailContent();
                 emailContent.title = "TeamMood for Ideas: KW" + getCalendarWeek();
-                emailContent.teams = new ArrayList<>();
-                emailContent.start = start();
-                emailContent.end = end();
+                emailContent.teams = new ConcurrentSkipListSet<>();
+                emailContent.start = TeamMoodWeek.start();
+                emailContent.end = TeamMoodWeek.end();
 
-                for (String apiKey : teamMoodProperties.getTeamApiKeys()) {
+                teamMoodProperties.getTeamApiKeys().parallelStream().forEach((apiKey) -> {
                     Team team = teamMood.loadTeamMoodForLastSevenDays(apiKey);
                     emailContent.teams.add(team);
-                }
+                });
 
                 String subject = "TeamMood for Ideas: KW" + getCalendarWeek();
 
@@ -112,20 +103,6 @@ public class TeamMoodApplication {
                 throw new RuntimeException(e.getMessage(), e);
             }
             LOG.info("END TeamMood mail sending");
-        }
-
-        private String getCalendarWeek() {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(new Date());
-            return "" + cal.get(Calendar.WEEK_OF_YEAR);
-        }
-
-        private String start() {
-            return dateTimeFormatter.format(LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.MONDAY)));
-        }
-
-        private String end() {
-            return dateTimeFormatter.format(LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)));
         }
 
 
