@@ -2,14 +2,11 @@ package de.axelspringer.ideas.team.mood;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import com.qmetric.spark.authentication.AuthenticationDetails;
-import com.qmetric.spark.authentication.BasicAuthenticationFilter;
 import de.axelspringer.ideas.team.mood.controller.TeamMoodController;
 import de.axelspringer.ideas.team.mood.mail.MailContent;
 import de.axelspringer.ideas.team.mood.mail.MailSender;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.DateBuilder;
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -29,7 +26,6 @@ import static de.axelspringer.ideas.team.mood.TeamMoodWeek.getCurrentCalendarWee
 import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
-import static spark.Spark.before;
 import static spark.Spark.port;
 
 public class TeamMoodApplication {
@@ -42,10 +38,10 @@ public class TeamMoodApplication {
         LOG.info("Starting on port '{}'", herokuAssignedPort);
         port(herokuAssignedPort);
 
-        if (StringUtils.isNotBlank(TeamMoodProperties.INSTANCE.getBasicAuthPassword())) {
-            before(new BasicAuthenticationFilter("/*",
-                    new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
-        }
+//        if (StringUtils.isNotBlank(TeamMoodProperties.INSTANCE.getBasicAuthPassword())) {
+//            before(new BasicAuthenticationFilter("/*",
+//                    new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
+//        }
         new TeamMoodController().initController();
         startScheduler();
     }
