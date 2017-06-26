@@ -1,10 +1,13 @@
 package de.axelspringer.ideas.team.mood.controller;
 
+import de.axelspringer.ideas.team.mood.TeamMoodApplication;
 import de.axelspringer.ideas.team.mood.TeamMoodProperties;
 import de.axelspringer.ideas.team.mood.TeamMoodWeek;
 import de.axelspringer.ideas.team.mood.mail.MailContent;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
@@ -17,11 +20,15 @@ import static spark.Spark.get;
 
 public class TeamMoodController {
 
+    private final static Logger LOG = LoggerFactory.getLogger(TeamMoodApplication.class);
+
     private TeamMoodProperties teamMoodProperties = TeamMoodProperties.INSTANCE;
 
     private TeamMood teamMood = new TeamMood();
 
     public void initController() {
+        LOG.info("Initializing controller.");
+
         HandlebarsTemplateEngine engine = new HandlebarsTemplateEngine();
 
         get("/", (request, response) -> {

@@ -34,7 +34,9 @@ public class TeamMoodApplication {
 
     public static void main(String[] args) throws Exception {
         //new HelloJob().execute(null);
-        port(getHerokuAssignedPort());
+        int herokuAssignedPort = getHerokuAssignedPort();
+        LOG.info("Starting on port '{}'", herokuAssignedPort);
+        port(herokuAssignedPort);
 //        before(new BasicAuthenticationFilter("/*",
 //                new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
         new TeamMoodController().initController();
