@@ -37,7 +37,7 @@ public class TeamMoodApplication {
 
     public static void main(String[] args) throws Exception {
         //new HelloJob().execute(null);
-        before(new BasicAuthenticationFilter("/path/*",
+        before(new BasicAuthenticationFilter("/*",
                 new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
         port(getHerokuAssignedPort());
         new TeamMoodController().initController();
