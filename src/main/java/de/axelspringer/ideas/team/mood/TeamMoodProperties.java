@@ -46,7 +46,7 @@ public class TeamMoodProperties {
 
     public String getBasicAuthPassword() {
         if (basicAuthPassword == null) {
-            basicAuthPassword = System.getProperty("de.axelspringer.ideas.team.mood.basicAuthPassword", "foo");
+            basicAuthPassword = System.getProperty("de.axelspringer.ideas.team.mood.basicAuthPassword");
         }
         return basicAuthPassword;
     }
