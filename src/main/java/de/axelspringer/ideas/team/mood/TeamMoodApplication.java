@@ -2,6 +2,8 @@ package de.axelspringer.ideas.team.mood;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import com.qmetric.spark.authentication.AuthenticationDetails;
+import com.qmetric.spark.authentication.BasicAuthenticationFilter;
 import de.axelspringer.ideas.team.mood.controller.TeamMoodController;
 import de.axelspringer.ideas.team.mood.mail.MailContent;
 import de.axelspringer.ideas.team.mood.mail.MailSender;
@@ -26,6 +28,7 @@ import static de.axelspringer.ideas.team.mood.TeamMoodWeek.getCurrentCalendarWee
 import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static spark.Spark.before;
 import static spark.Spark.port;
 
 public class TeamMoodApplication {
@@ -34,6 +37,8 @@ public class TeamMoodApplication {
 
     public static void main(String[] args) throws Exception {
         //new HelloJob().execute(null);
+        before(new BasicAuthenticationFilter("/path/*",
+                new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
         port(getHerokuAssignedPort());
         new TeamMoodController().initController();
         startScheduler();

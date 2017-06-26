@@ -10,6 +10,7 @@ public class TeamMoodProperties {
     private String username;
 
     private String password;
+    private String basicAuthPassword;
 
     private List<String> teamApiKeys;
 
@@ -41,5 +42,12 @@ public class TeamMoodProperties {
             emails = Arrays.asList(System.getProperty("de.axelspringer.ideas.team.mood.email.addresses").split(","));
         }
         return emails;
+    }
+
+    public String getBasicAuthPassword() {
+        if (basicAuthPassword == null) {
+            basicAuthPassword = System.getProperty("de.axelspringer.ideas.team.mood.basicAuthPassword");
+        }
+        return basicAuthPassword;
     }
 }
