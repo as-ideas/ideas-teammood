@@ -1,4 +1,4 @@
-package de.axelspringer.ideas.team.mood;
+package de.axelspringer.ideas.team.mood.letsencrypt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.config.RegistryBuilder;

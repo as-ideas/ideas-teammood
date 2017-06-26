@@ -12,6 +12,7 @@ public class MailContent {
     public String title;
     public String start;
     public String end;
+    public String weekNumber;
     public Collection<Team> teams;
 
 

@@ -1,4 +1,4 @@
-import de.axelspringer.ideas.team.mood.TeamMoodHttpClientFactory;
+import de.axelspringer.ideas.team.mood.letsencrypt.TeamMoodHttpClientFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

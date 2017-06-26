@@ -2,6 +2,7 @@ package de.axelspringer.ideas.team.mood;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import de.axelspringer.ideas.team.mood.controller.TeamMoodController;
 import de.axelspringer.ideas.team.mood.mail.MailContent;
 import de.axelspringer.ideas.team.mood.mail.MailSender;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import static de.axelspringer.ideas.team.mood.TeamMoodWeek.getCalendarWeek;
+import static de.axelspringer.ideas.team.mood.TeamMoodWeek.getCurrentCalendarWeek;
 import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -32,7 +33,7 @@ public class TeamMoodApplication {
 
     public static void main(String[] args) throws Exception {
         //new HelloJob().execute(null);
-        new TeamMoodController().init();
+        new TeamMoodController().initController();
         startScheduler();
     }
 
@@ -80,17 +81,17 @@ public class TeamMoodApplication {
             try {
 
                 MailContent emailContent = new MailContent();
-                emailContent.title = "TeamMood for Ideas: KW" + getCalendarWeek();
+                emailContent.title = "TeamMood for Ideas: KW" + getCurrentCalendarWeek();
                 emailContent.teams = new ConcurrentSkipListSet<>();
-                emailContent.start = TeamMoodWeek.start();
-                emailContent.end = TeamMoodWeek.end();
+                emailContent.start = TeamMoodWeek.start(TeamMoodWeek.currentWeek());
+                emailContent.end = TeamMoodWeek.end(TeamMoodWeek.currentWeek());
 
                 teamMoodProperties.getTeamApiKeys().parallelStream().forEach((apiKey) -> {
                     Team team = teamMood.loadTeamMoodForLastSevenDays(apiKey);
                     emailContent.teams.add(team);
                 });
 
-                String subject = "TeamMood for Ideas: KW" + getCalendarWeek();
+                String subject = "TeamMood for Ideas: KW" + getCurrentCalendarWeek();
 
 
                 String htmlBody = emailTemplate.apply(emailContent);

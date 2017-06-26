@@ -1,4 +1,4 @@
-package de.axelspringer.ideas.team.mood;
+package de.axelspringer.ideas.team.mood.letsencrypt;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;
