@@ -33,7 +33,7 @@ public class TeamMoodWeek {
     public static LocalDate week(Integer number) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
-        cal.set(Calendar.WEEK_OF_YEAR, number);
+        cal.set(Calendar.WEEK_OF_YEAR, number + 1);
         return LocalDateTime.ofInstant(cal.toInstant(), ZoneId.of("Europe/Berlin")).toLocalDate();
     }
 
@@ -51,6 +51,6 @@ public class TeamMoodWeek {
     public static Integer currentWeekNumber() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
-        return cal.get(Calendar.WEEK_OF_YEAR);
+        return cal.get(Calendar.WEEK_OF_YEAR) + 1;
     }
 }

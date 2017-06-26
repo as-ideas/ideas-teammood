@@ -28,10 +28,26 @@
             width: 100%;
             border: none;
         }
+
+        .message-box {
+            position: absolute;
+            margin: auto;
+            top: 60px;
+            right: 10%;
+            z-index: 9000;
+        }
     </style>
 </head>
 
 <body>
+
+<div class="alert alert-success message-box hidden">
+    <strong>Success!</strong> Mail was send.
+</div>
+
+<div class="alert alert-error message-box hidden">
+    <strong>Error!</strong> Mail NOT send.
+</div>
 
 <!-- Navigation -->
 <nav class="navbar navbar-inverse navbar-static-top justify-content-center" role="navigation">
@@ -51,15 +67,18 @@
         <div class="col-md-3">
             <p class="lead">Week #<i class="weekno"></i></p>
             <div class="list-group">
-                <a href="#" class="list-group-item teammood-week active">1</a>
-                <a href="#" class="list-group-item teammood-week">2</a>
-                <a href="#" class="list-group-item teammood-week">3</a>
+                <select class="form-control list-group-item teammood-week" id="selectWeek">
+                </select>
             </div>
+            <div class="button-group">
+                <button type="button" class="btn btn-primary send-mail" onclick="sendMail()">Send Mail for week</button>
+            </div>
+            <br/>
         </div>
 
         <div class="col-md-9">
             <div class="well">
-                <iframe id="myIframe" src="week/1" frameborder="0"></iframe>
+                <iframe id="myIframe" frameborder="0"></iframe>
             </div>
         </div>
     </div>
@@ -87,24 +106,64 @@
 <script>
     var iframe = document.querySelector("#myIframe");
     var weekno = document.querySelector(".weekno");
+    var selectWeek = document.querySelector("#selectWeek");
 
     iframe.addEventListener("load", function (e) {
         console.info("Loaded iframe for src: " + iframe.src);
         resizeIFrameToFitContent(this);
-
     });
 
-    var allWeeks = document.querySelectorAll(".teammood-week");
-    for (var i = 0; i < allWeeks.length; ++i) {
-        var weekNumber = allWeeks[i].text;
-        console.info("Setting to week #" + weekNumber);
-        iframe.src = "week/" + weekNumber;
-        weekno.text = weekNumber;
+    var currentWeekNumber = getCurrentWeekNumber();
+    console.info("Current week is #" + currentWeekNumber);
+
+    // fill List-Box
+    for (var i = 0; i < currentWeekNumber; ++i) {
+        var option = document.createElement('option');
+        option.value = i + 1;
+        option.innerHTML = i + 1;
+        selectWeek.appendChild(option);
+    }
+    selectWeek.addEventListener("change", function (e) {
+        weekno.innerHTML = selectWeek.value;
+        iframe.src = "week/" + selectWeek.value;
+    });
+
+    weekno.innerHTML = currentWeekNumber;
+    selectWeek.value = currentWeekNumber;
+    iframe.src = "week/" + currentWeekNumber;
+
+    function sendMail() {
+        console.info("SEND!");
+        document.querySelector(".send-mail").disabled = true;
+        $.get("week/" + selectWeek.value + "/send")
+                .done(function (data) {
+                    console.info("OK");
+                })
+                .fail(function (data) {
+                    console.error("ERROR");
+                })
+                .always(function (data) {
+                    document.querySelector(".send-mail").disabled = false;
+                });
     }
 
     function resizeIFrameToFitContent(iFrame) {
         iFrame.width = iFrame.contentWindow.document.body.scrollWidth;
         iFrame.height = iFrame.contentWindow.document.body.scrollHeight;
     }
+
+    function getCurrentWeekNumber() {
+        var dt = new Date();
+        var tdt = new Date();
+        var dayn = (dt.getDay() + 6) % 7;
+        tdt.setDate(tdt.getDate() - dayn + 3);
+        var firstThursday = tdt.valueOf();
+        tdt.setMonth(0, 1);
+        if (tdt.getDay() !== 4) {
+            tdt.setMonth(0, 1 + ((4 - tdt.getDay()) + 7) % 7);
+        }
+        return 1 + Math.ceil((firstThursday - tdt) / 604800000);
+    }
+
 </script>
 </html>

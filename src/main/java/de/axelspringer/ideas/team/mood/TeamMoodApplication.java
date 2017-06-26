@@ -77,7 +77,7 @@ public class TeamMoodApplication {
 
         public HelloJob() {
             this.teamMoodProperties = TeamMoodProperties.INSTANCE;
-            this.mailSender = new MailSender(this.teamMoodProperties.getUsername(), this.teamMoodProperties.getPassword());
+            this.mailSender = new MailSender();
             this.teamMood = new TeamMood();
             this.handlebars = new Handlebars();
 
@@ -104,7 +104,7 @@ public class TeamMoodApplication {
                     emailContent.teams.add(team);
                 });
 
-                String subject = "TeamMood for Ideas: KW" + getCurrentCalendarWeek();
+                String subject = "TeamMood for Ideas: KW" + TeamMoodWeek.currentWeekNumber();
 
 
                 String htmlBody = emailTemplate.apply(emailContent);

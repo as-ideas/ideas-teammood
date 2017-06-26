@@ -64,7 +64,7 @@ public class TeamMood {
         String start = TeamMoodWeek.startFormattedWithTeamMoodSettings(week);
         String end = TeamMoodWeek.endFormattedWithTeamMoodSettings(week);
 
-        LOG.info("Loading data from TeamMood!");
+        LOG.info("Loading data from TeamMood from '{}' to '{}'!", start, end);
         String url = String.format(URL_TO_TEAM_MOOD, teamApiKey, start, end);
         return getMoodDataFromTeamMood(teamApiKey, url);
     }

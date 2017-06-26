@@ -1,5 +1,6 @@
 package de.axelspringer.ideas.team.mood.mail;
 
+import de.axelspringer.ideas.team.mood.TeamMoodProperties;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +18,9 @@ public class MailSender {
 
     private final static Logger log = LoggerFactory.getLogger(MailSender.class);
 
-    private final String username;
+    private final String username = TeamMoodProperties.INSTANCE.getUsername();
 
-    private final String password;
-
-    public MailSender(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+    private final String password = TeamMoodProperties.INSTANCE.getUsername();
 
     public void writeToFile(String receiverEmail, String subject, String htmlBody) {
         try {

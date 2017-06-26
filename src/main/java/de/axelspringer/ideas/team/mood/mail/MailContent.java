@@ -15,7 +15,6 @@ public class MailContent {
     public String weekNumber;
     public Collection<Team> teams;
 
-
     public String getTitle() {
         return title;
     }
@@ -30,6 +29,10 @@ public class MailContent {
 
     public String getEnd() {
         return end;
+    }
+
+    public String getWeekNumber() {
+        return weekNumber;
     }
 
     public String getAverageMood() {
