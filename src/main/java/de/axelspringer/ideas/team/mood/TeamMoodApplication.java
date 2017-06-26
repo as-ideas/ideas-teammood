@@ -26,6 +26,7 @@ import static de.axelspringer.ideas.team.mood.TeamMoodWeek.getCurrentCalendarWee
 import static org.quartz.CronScheduleBuilder.weeklyOnDayAndHourAndMinute;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
+import static spark.Spark.port;
 
 public class TeamMoodApplication {
 
@@ -33,6 +34,7 @@ public class TeamMoodApplication {
 
     public static void main(String[] args) throws Exception {
         //new HelloJob().execute(null);
+        port(getHerokuAssignedPort());
         new TeamMoodController().initController();
         startScheduler();
     }
@@ -107,5 +109,14 @@ public class TeamMoodApplication {
         }
 
 
+    }
+
+
+    private static int getHerokuAssignedPort() {
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        if (processBuilder.environment().get("PORT") != null) {
+            return Integer.parseInt(processBuilder.environment().get("PORT"));
+        }
+        return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
     }
 }
