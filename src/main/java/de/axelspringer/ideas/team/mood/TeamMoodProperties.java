@@ -8,8 +8,9 @@ public class TeamMoodProperties {
     public static final TeamMoodProperties INSTANCE = new TeamMoodProperties();
 
     private String username;
-
     private String password;
+    private String elasticMailApiKey;
+
     private String basicAuthPassword;
 
     private List<String> teamApiKeys;
@@ -51,11 +52,21 @@ public class TeamMoodProperties {
         return basicAuthPassword;
     }
 
+    public String getElasticMailApiKey() {
+        if (elasticMailApiKey == null) {
+            elasticMailApiKey = getProperty("de.axelspringer.ideas.team.mood.elasticMailApiKey");
+        }
+        return elasticMailApiKey;
+    }
+
     private String getProperty(String s) {
         String result = System.getProperty(s);
         if (result == null) {
             result = System.getenv(s);
         }
         return result;
+
     }
+
+
 }

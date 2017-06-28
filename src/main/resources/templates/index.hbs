@@ -45,7 +45,7 @@
     <strong>Success!</strong> Mail was send.
 </div>
 
-<div class="alert alert-error message-box hidden">
+<div class="alert alert-danger message-box hidden">
     <strong>Error!</strong> Mail NOT send.
 </div>
 
@@ -138,9 +138,17 @@
         $.get("week/" + selectWeek.value + "/send")
                 .done(function (data) {
                     console.info("OK");
+                    document.querySelector(".alert-success").classList.remove("hidden");
+                    window.setTimeout(function () {
+                        document.querySelector(".alert-success").classList.add("hidden");
+                    }, 10000);
                 })
                 .fail(function (data) {
                     console.error("ERROR");
+                    document.querySelector(".alert-danger").classList.remove("hidden");
+                    window.setTimeout(function () {
+                        document.querySelector(".alert-danger").classList.add("hidden");
+                    }, 10000);
                 })
                 .always(function (data) {
                     document.querySelector(".send-mail").disabled = false;

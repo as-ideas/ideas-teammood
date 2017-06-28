@@ -1,5 +1,7 @@
 package de.axelspringer.ideas.team.mood.moods;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 import de.axelspringer.ideas.team.mood.TeamMoodWeek;
 import de.axelspringer.ideas.team.mood.letsencrypt.TeamMoodHttpClientFactory;
@@ -17,10 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 public class TeamMood {
 
@@ -33,6 +35,9 @@ public class TeamMood {
     private Gson gson = new Gson();
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
+    private Cache<String, Team> cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build();
 
     public Team loadTeamMoodForLastSevenDays(String teamApiKey) {
         LOG.info("Loading data from TeamMood!");
@@ -44,7 +49,7 @@ public class TeamMood {
     public Integer loadNumberOfMembers(String teamApiKey) {
         LOG.info("Loading participation from TeamMood!");
         try {
-            CloseableHttpClient httpclient = getaDefault();
+            CloseableHttpClient httpclient = getPreparedClient();
             HttpGet httpGet = new HttpGet(String.format(URL_TO_PARTICIPATION_WITH_PLACEHOLDER, teamApiKey));
 
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
@@ -60,26 +65,23 @@ public class TeamMood {
         }
     }
 
-    public Team loadTeamMoodForWeek(String teamApiKey, LocalDate week) {
-        String start = TeamMoodWeek.startFormattedWithTeamMoodSettings(week);
-        String end = TeamMoodWeek.endFormattedWithTeamMoodSettings(week);
+    public Team loadTeamMoodForWeek(String teamApiKey, TeamMoodWeek week) {
+        String start = week.startFormattedWithTeamMoodSettings();
+        String end = week.endFormattedWithTeamMoodSettings();
 
         LOG.info("Loading data from TeamMood from '{}' to '{}'!", start, end);
         String url = String.format(URL_TO_TEAM_MOOD, teamApiKey, start, end);
         return getMoodDataFromTeamMood(teamApiKey, url);
     }
 
-    private CloseableHttpClient getaDefault() {
-        return new TeamMoodHttpClientFactory().init();
-    }
-
-    private LocalDateTime epochMilisToLocalDateTime(TeamMoodDay day) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(day.nativeDate), ZoneId.of("Europe/Berlin"));
-    }
-
     private Team getMoodDataFromTeamMood(String teamApiKey, String url) {
+        Team result = cache.getIfPresent(url);
+        if (result != null) {
+            return result;
+        }
+
         try {
-            CloseableHttpClient httpclient = getaDefault();
+            CloseableHttpClient httpclient = getPreparedClient();
             HttpGet httpGet = new HttpGet(url);
 
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
@@ -100,11 +102,20 @@ public class TeamMood {
                 team.id = teamApiKey;
                 team.numberOfMembers = loadNumberOfMembers(teamApiKey);
 
+                cache.put(url, team);
                 return team;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private CloseableHttpClient getPreparedClient() {
+        return new TeamMoodHttpClientFactory().init();
+    }
+
+    private LocalDateTime epochMilisToLocalDateTime(TeamMoodDay day) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(day.nativeDate), ZoneId.of("Europe/Berlin"));
     }
 
     private void checkStatusCode(CloseableHttpResponse response, String resultString) {

@@ -1,6 +1,5 @@
 package de.axelspringer.ideas.team.mood.letsencrypt;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -74,11 +73,8 @@ public class TeamMoodHttpClientFactory {
 
     private KeyStore getKeyStore() throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks = KeyStore.getInstance("JKS");
-        InputStream is = new ClassPathResource(LETSENCRYPT_TRUSTSTORE_PATH).getInputStream();
-        try {
+        try (InputStream is = new ClassPathResource(LETSENCRYPT_TRUSTSTORE_PATH).getInputStream()) {
             ks.load(is, KEYSTORE_PASSWORD);
-        } finally {
-            IOUtils.closeQuietly(is);
         }
         return ks;
     }

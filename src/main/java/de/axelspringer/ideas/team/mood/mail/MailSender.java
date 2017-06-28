@@ -1,98 +1,56 @@
 package de.axelspringer.ideas.team.mood.mail;
 
 import de.axelspringer.ideas.team.mood.TeamMoodProperties;
-import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.Message;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.File;
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MailSender {
 
     private final static Logger log = LoggerFactory.getLogger(MailSender.class);
 
-    private final String username = TeamMoodProperties.INSTANCE.getUsername();
-
-    private final String password = TeamMoodProperties.INSTANCE.getUsername();
-
-    public void writeToFile(String receiverEmail, String subject, String htmlBody) {
-        try {
-            FileUtils.writeStringToFile(new File("/Users/swaschni/Projekte/ideas-teammood/target/mail.html"), htmlBody);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public void sendViaMailgun(String receiverEmail, String subject, String htmlBody) {
-        try {
-            log.info("Sending mail with MailGun to: " + receiverEmail);
-
-            Properties props = new Properties();
-
-            props.put("mail.smtp.starttls.enable", true); // added this line
-            props.put("mail.smtp.auth", true);
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
-
-            Session session = Session.getInstance(props,
-                    new javax.mail.Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(username, password);
-                        }
-                    });
-
-            MimeMessage message = new MimeMessage(session);
-
-            message.setFrom(new InternetAddress("Axel Springer Ideas Engineering <hello@asideas.de>"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverEmail));
-            message.setSubject(subject);
-            message.setContent(htmlBody, "text/html; charset=utf-8");
-
-            log.info("Sending mail...");
-            Transport.send(message);
-            log.info("Done.");
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
+    private final String apiKey = TeamMoodProperties.INSTANCE.getElasticMailApiKey();
 
     public void send(String receiverEmail, String subject, String htmlBody) {
         try {
-            log.info("Sending mail to: " + receiverEmail);
+            log.info("Sending mail with ElasticMail to: " + receiverEmail);
 
-            Properties props = new Properties();
+            String from = "noreply@asideas.de";
+            String fromName = "Axel Springer Ideas Engineering Teammood";
 
-            props.put("mail.smtp.starttls.enable", true); // added this line
-            props.put("mail.smtp.auth", true);
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            props.put("mail.smtp.port", "587");
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            HttpPost httpPost = new HttpPost("https://api.elasticemail.com/v2/email/send");
 
-            Session session = Session.getInstance(props,
-                    new javax.mail.Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(username, password);
-                        }
-                    });
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("apikey", apiKey));
+            nvps.add(new BasicNameValuePair("from", from));
+            nvps.add(new BasicNameValuePair("fromName", fromName));
+            nvps.add(new BasicNameValuePair("subject", subject));
+            nvps.add(new BasicNameValuePair("bodyHtml", htmlBody));
+            nvps.add(new BasicNameValuePair("to", receiverEmail));
+            nvps.add(new BasicNameValuePair("isTransactional", "true"));
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 
-            MimeMessage message = new MimeMessage(session);
-
-            message.setFrom(new InternetAddress("Axel Springer Ideas Engineering <hello@asideas.de>"));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverEmail));
-            message.setSubject(subject);
-            message.setContent(htmlBody, "text/html; charset=utf-8");
-
-            log.info("Sending mail...");
-            Transport.send(message);
+            try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
+                System.out.println(response.getStatusLine());
+                HttpEntity entity = response.getEntity();
+                System.out.println(EntityUtils.toString(entity, "UTF-8"));
+            }
             log.info("Done.");
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
+
 }

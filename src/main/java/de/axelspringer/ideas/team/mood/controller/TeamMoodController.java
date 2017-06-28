@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -44,7 +43,7 @@ public class TeamMoodController {
             String currentWeek = request.params(":week");
             LOG.info("Loading data for week '{}'.", currentWeek);
             validateCurrentWeek(currentWeek);
-            LocalDate week = TeamMoodWeek.week(Integer.valueOf(currentWeek));
+            TeamMoodWeek week = new TeamMoodWeek(currentWeek);
 
             MailContent emailContent = createMailContent(week);
 
@@ -56,13 +55,13 @@ public class TeamMoodController {
             String currentWeek = request.params(":week");
             LOG.info("Loading data for week '{}'.", currentWeek);
             validateCurrentWeek(currentWeek);
-            LocalDate week = TeamMoodWeek.week(Integer.valueOf(currentWeek));
+            TeamMoodWeek week = new TeamMoodWeek(currentWeek);
 
             MailContent emailContent = createMailContent(week);
 
             Template emailTemplate = new Handlebars().compile("templates/email");
 
-            String subject = "TeamMood for Ideas: KW" + TeamMoodWeek.currentWeekNumber();
+            String subject = "TeamMood for Ideas: KW" + week.weekNumber();
             String htmlBody = emailTemplate.apply(emailContent);
             for (String mailAddress : teamMoodProperties.getEmailAddresses()) {
                 mailSender.send(mailAddress, subject, htmlBody);
@@ -72,13 +71,13 @@ public class TeamMoodController {
         });
     }
 
-    private MailContent createMailContent(LocalDate week) {
+    private MailContent createMailContent(TeamMoodWeek week) {
         MailContent emailContent = new MailContent();
-        emailContent.title = "TeamMood for Ideas: KW" + TeamMoodWeek.currentWeekNumber();
+        emailContent.title = "TeamMood for Ideas: KW" + week.weekNumber();
         emailContent.teams = new ConcurrentSkipListSet<>();
-        emailContent.start = TeamMoodWeek.start(week);
-        emailContent.end = TeamMoodWeek.end(week);
-        emailContent.weekNumber = "" + TeamMoodWeek.currentWeekNumber();
+        emailContent.start = week.start();
+        emailContent.end = week.end();
+        emailContent.weekNumber = "" + week.weekNumber();
 
         teamMoodProperties.getTeamApiKeys().parallelStream().forEach((apiKey) -> {
             Team team = teamMood.loadTeamMoodForWeek(apiKey, week);

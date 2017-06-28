@@ -14,43 +14,58 @@ public class TeamMoodWeek {
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter dateTimeFormatter2 = DateTimeFormatter.ofPattern("dd-MM-YYYY");
 
-    public static String start(LocalDate time) {
-        return dateTimeFormatter.format(time.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)));
-    }
-
-    public static String end(LocalDate time) {
-        return dateTimeFormatter.format(time.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)));
-    }
-
-    public static String startFormattedWithTeamMoodSettings(LocalDate time) {
-        return dateTimeFormatter2.format(time.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)));
-    }
-
-    public static String endFormattedWithTeamMoodSettings(LocalDate time) {
-        return dateTimeFormatter2.format(time.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)));
-    }
-
-    public static LocalDate week(Integer number) {
+    public static TeamMoodWeek currentWeek() {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date());
-        cal.set(Calendar.WEEK_OF_YEAR, number + 1);
+        return new TeamMoodWeek(cal.get(Calendar.WEEK_OF_YEAR) + 1);
+    }
+
+    private int weekNumber;
+    private LocalDate week;
+
+    public TeamMoodWeek(String weekNumber) {
+        this(Integer.valueOf(weekNumber));
+    }
+
+    public TeamMoodWeek(int weekNumber) {
+        this.weekNumber = weekNumber;
+        this.week = week(weekNumber);
+    }
+
+    public String start() {
+        return dateTimeFormatter.format(monday());
+    }
+
+    public String end() {
+        return dateTimeFormatter.format(friday());
+    }
+
+    public String startFormattedWithTeamMoodSettings() {
+        return dateTimeFormatter2.format(monday());
+    }
+
+    public String endFormattedWithTeamMoodSettings() {
+        return dateTimeFormatter2.format(friday());
+    }
+
+    private LocalDate monday() {
+        return week.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+    }
+
+    private LocalDate friday() {
+        return week.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+    }
+
+    private LocalDate week(Integer number) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.set(Calendar.WEEK_OF_YEAR, number);
+        cal.set(Calendar.DAY_OF_WEEK, 4);
         return LocalDateTime.ofInstant(cal.toInstant(), ZoneId.of("Europe/Berlin")).toLocalDate();
     }
 
-    public static LocalDate currentWeek() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        return LocalDateTime.ofInstant(cal.toInstant(), ZoneId.of("Europe/Berlin")).toLocalDate();
-    }
 
-    @Deprecated
-    public static String getCurrentCalendarWeek() {
-        return "" + currentWeekNumber();
-    }
-
-    public static Integer currentWeekNumber() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        return cal.get(Calendar.WEEK_OF_YEAR) + 1;
+    public String weekNumber() {
+        return "" + weekNumber;
     }
 }

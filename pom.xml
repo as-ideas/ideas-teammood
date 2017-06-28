@@ -31,27 +31,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>2.1.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-            <version>1.5.0-b01</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-lambda-java-core</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>22.0</version>
         </dependency>
 
         <dependency>
@@ -66,9 +48,9 @@
             <version>4.5.3</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>org.apache.httpcomponents.client5</groupId>-->
-            <!--<artifactId>httpclient5</artifactId>-->
-            <!--<version>5.0-alpha2</version>-->
+        <!--<groupId>org.apache.httpcomponents.client5</groupId>-->
+        <!--<artifactId>httpclient5</artifactId>-->
+        <!--<version>5.0-alpha2</version>-->
         <!--</dependency>-->
 
         <dependency>
@@ -89,6 +71,12 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
             <version>4.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.8.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
