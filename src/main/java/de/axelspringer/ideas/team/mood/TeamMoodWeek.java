@@ -45,7 +45,7 @@ public class TeamMoodWeek {
     }
 
     public String endFormattedWithTeamMoodSettings() {
-        return dateTimeFormatter2.format(friday());
+        return dateTimeFormatter2.format(saturday());
     }
 
     private LocalDate monday() {
@@ -54,6 +54,10 @@ public class TeamMoodWeek {
 
     private LocalDate friday() {
         return week.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+    }
+
+    private LocalDate saturday() {
+        return week.with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
     }
 
     private LocalDate week(Integer number) {
