@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.template.handlebars.HandlebarsTemplateEngine;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import static spark.Spark.get;
@@ -51,24 +53,33 @@ public class TeamMoodController {
         }, engine);
 
         get("/week/:week/send", (request, response) -> {
-
             String currentWeek = request.params(":week");
-            LOG.info("Loading data for week '{}'.", currentWeek);
-            validateCurrentWeek(currentWeek);
-            TeamMoodWeek week = new TeamMoodWeek(currentWeek);
-
-            MailContent emailContent = createMailContent(week);
-
-            Template emailTemplate = new Handlebars().compile("templates/email");
-
-            String subject = "TeamMood for Ideas: KW" + week.weekNumber();
-            String htmlBody = emailTemplate.apply(emailContent);
-            for (String mailAddress : teamMoodProperties.getEmailAddresses()) {
-                mailSender.send(mailAddress, subject, htmlBody);
-            }
-
+            sendMailForWeek(teamMoodProperties.getEmailAddresses(), currentWeek);
             return "{}";
         });
+
+
+        get("/week/:week/send-all", (request, response) -> {
+            String currentWeek = request.params(":week");
+            sendMailForWeek(teamMoodProperties.getAllEmailAddresses(), currentWeek);
+            return "{}";
+        });
+    }
+
+    private void sendMailForWeek(List<String> addresses, String currentWeek) throws IOException {
+        LOG.info("Loading data for week '{}'.", currentWeek);
+        validateCurrentWeek(currentWeek);
+        TeamMoodWeek week = new TeamMoodWeek(currentWeek);
+
+        MailContent emailContent = createMailContent(week);
+
+        Template emailTemplate = new Handlebars().compile("templates/email");
+
+        String subject = "TeamMood for Ideas: KW" + week.weekNumber();
+        String htmlBody = emailTemplate.apply(emailContent);
+        for (String mailAddress : addresses) {
+            mailSender.send(mailAddress, subject, htmlBody);
+        }
     }
 
     private MailContent createMailContent(TeamMoodWeek week) {

@@ -1,3 +1,5 @@
+package de.axelspringer.ideas.team.mood;
+
 import de.axelspringer.ideas.team.mood.letsencrypt.TeamMoodHttpClientFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -5,6 +7,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -23,6 +26,7 @@ public class TeamMoodHttpClientFactoryTest {
         Assert.assertNotNull(response);
     }
 
+    @Ignore
     @Test(expected = SSLHandshakeException.class)
     public void defaultClient_shouldWorkOnLetsEncryptPage() throws Exception {
         final CloseableHttpClient client = HttpClients.createDefault();

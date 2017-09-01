@@ -16,6 +16,7 @@ public class TeamMoodProperties {
     private List<String> teamApiKeys;
 
     private List<String> emails;
+    private List<String> emailsAll;
 
     public String getUsername() {
         if (username == null) {
@@ -43,6 +44,13 @@ public class TeamMoodProperties {
             emails = Arrays.asList(getProperty("de.axelspringer.ideas.team.mood.email.addresses").split(","));
         }
         return emails;
+    }
+
+    public List<String> getAllEmailAddresses() {
+        if (emailsAll == null) {
+            emailsAll = Arrays.asList(getProperty("de.axelspringer.ideas.team.mood.email.addresses.all").split(","));
+        }
+        return emailsAll;
     }
 
     public String getBasicAuthPassword() {
