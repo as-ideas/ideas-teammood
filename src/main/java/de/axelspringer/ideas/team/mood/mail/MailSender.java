@@ -52,5 +52,4 @@ public class MailSender {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
 }

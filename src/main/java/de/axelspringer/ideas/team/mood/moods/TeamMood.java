@@ -9,6 +9,7 @@ import de.axelspringer.ideas.team.mood.moods.entity.OneMoodValue;
 import de.axelspringer.ideas.team.mood.moods.entity.ParticipationResponse;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodDay;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -96,6 +97,7 @@ public class TeamMood {
                     for (OneMoodValue value : day.values) {
                         value.nativeDate = day.nativeDate;
                         value.formattedDate = WordUtils.capitalizeFully(dateTimeOfDay.getDayOfWeek().name()) + ", " + dateTimeFormatter.format(dateTimeOfDay);
+                        value.comment = StringEscapeUtils.escapeHtml3(value.comment);
                     }
                 }
 
