@@ -1,8 +1,8 @@
 package de.axelspringer.ideas.team.mood;
 
 import com.qmetric.spark.authentication.AuthenticationDetails;
-import com.qmetric.spark.authentication.BasicAuthenticationFilter;
 import de.axelspringer.ideas.team.mood.controller.TeamMoodController;
+import de.axelspringer.ideas.team.mood.util.AdvancedSparkBasicAuthenticationFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +20,7 @@ public class TeamMoodApplication {
         port(herokuAssignedPort);
 
         if (StringUtils.isNotBlank(TeamMoodProperties.INSTANCE.getBasicAuthPassword())) {
-            before(new BasicAuthenticationFilter("/*",
-                    new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
+            before(new AdvancedSparkBasicAuthenticationFilter("/*", new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
         }
         new TeamMoodController().initController();
     }

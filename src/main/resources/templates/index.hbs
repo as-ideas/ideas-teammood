@@ -71,8 +71,12 @@
                 </select>
             </div>
             <div class="button-group">
-                <button type="button" class="btn btn-primary send-mail" onclick="sendMail()">Send Mail for week</button>
                 <button type="button" class="btn btn-info send-mail" onclick="openMail()">Open</button>
+                <button type="button" class="btn btn-primary send-mail" onclick="openPublicUrl()">Open with public url</button>
+            </div>
+            <br/>
+            <div class="button-group">
+                <button type="button" class="btn btn-primary send-mail" onclick="sendMail()">Send Mail for week</button>
             </div>
             <br/>
             <div class="button-group">
@@ -188,6 +192,23 @@
                 });
     }
 
+    function openPublicUrl() {
+        $.get("week/" + selectWeek.value + "/secret")
+                .done(function (data) {
+                    data = JSON.parse(data);
+                    console.info("OK", data);
+
+                    var win = window.open(data.url, '_blank');
+                    win.focus();
+                })
+                .fail(function (data) {
+                    console.error("ERROR");
+                    document.querySelector(".alert-danger").classList.remove("hidden");
+                    window.setTimeout(function () {
+                        document.querySelector(".alert-danger").classList.add("hidden");
+                    }, 10000);
+                });
+    }
 
     function resizeIFrameToFitContent(iFrame) {
         iFrame.width = iFrame.contentWindow.document.body.scrollWidth;

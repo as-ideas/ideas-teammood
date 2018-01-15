@@ -9,6 +9,7 @@ import de.axelspringer.ideas.team.mood.mail.MailContent;
 import de.axelspringer.ideas.team.mood.mail.MailSender;
 import de.axelspringer.ideas.team.mood.moods.TeamMood;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
+import de.axelspringer.ideas.team.mood.util.SymetricEncryption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
@@ -58,6 +59,23 @@ public class TeamMoodController {
             return "{}";
         });
 
+        get("/week/:week/secret", (request, response) -> {
+            String currentWeek = request.params(":week");
+            String url = request.scheme() + "://" + request.host() + "/week-by-secret-key/" + SymetricEncryption.encryptAndBase58(currentWeek);
+            return "{ \"url\": \"" + url + "\" }";
+        });
+
+        get("/week-by-secret-key/:secret", (request, response) -> {
+            String secret = request.params(":secret");
+            String currentWeek = SymetricEncryption.decryptAndBase58(secret);
+
+
+            LOG.info("Loading data for week '{}'.", currentWeek);
+            validateCurrentWeek(currentWeek);
+            TeamMoodWeek week = new TeamMoodWeek(currentWeek);
+            MailContent emailContent = createMailContent(week);
+            return new ModelAndView(emailContent, "email.hbs");
+        }, engine);
 
         get("/week/:week/send-all", (request, response) -> {
             String currentWeek = request.params(":week");
