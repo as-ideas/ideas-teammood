@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import static spark.Spark.before;
 import static spark.Spark.port;
+import static spark.Spark.staticFiles;
 
 public class TeamMoodApplication {
 
@@ -18,6 +19,7 @@ public class TeamMoodApplication {
         int herokuAssignedPort = getHerokuAssignedPort();
         LOG.info("Starting on port '{}'", herokuAssignedPort);
         port(herokuAssignedPort);
+        staticFiles.location("/public");
 
         if (StringUtils.isNotBlank(TeamMoodProperties.INSTANCE.getBasicAuthPassword())) {
             before(new AdvancedSparkBasicAuthenticationFilter("/*", new AuthenticationDetails("ideas", TeamMoodProperties.INSTANCE.getBasicAuthPassword())));
