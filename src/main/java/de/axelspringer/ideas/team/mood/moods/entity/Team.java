@@ -10,7 +10,6 @@ public class Team implements Comparable<Team> {
     public String id;
     public String teamName;
     public TeamMoodDay[] days;
-    public Integer numberOfMembers;
 
     public List<OneMoodValue> getAllValuesSorted() {
         List<OneMoodValue> result = new ArrayList<>();
@@ -45,15 +44,11 @@ public class Team implements Comparable<Team> {
     }
 
     public String getParticipation() {
-        // 5 days * Number
-        int maxCount = 5 * numberOfMembers;
-        int count = 0;
+        int sum=0;
         for (TeamMoodDay day : days) {
-            for (OneMoodValue value : day.values) {
-                count++;
-            }
+           sum+=day.getParticipationRate();
         }
-        return "" + (100 * count / maxCount) + "%";
+        return "" + (sum / days.length) + "%";
     }
 
 

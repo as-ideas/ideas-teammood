@@ -53,18 +53,18 @@ public class MailContent {
         return new DecimalFormat("#.0").format(result);
     }
 
+    // Over all teams
     public String getParticipation() {
-        // 5 days * Number
-        int maxCount = 0;
+        int sum = 0;
         int count = 0;
         for (Team team : teams) {
-            maxCount += (team.numberOfMembers * 5);
             for (TeamMoodDay day : team.getDays()) {
-                for (OneMoodValue value : day.values) {
-                    count++;
-                }
+                sum += day.getParticipationRate();
+                count++;
             }
+
         }
-        return "" + (100 * count / maxCount) + "%";
+        return "" + (sum / count) + "%";
+
     }
 }

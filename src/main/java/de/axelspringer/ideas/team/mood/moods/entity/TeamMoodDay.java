@@ -7,6 +7,7 @@ public class TeamMoodDay {
     public String dateShort; // ": "Tue 3/14/17",
     public long nativeDate; //": 1489446000000,
     public OneMoodValue[] values;
+    public long participationRate; // 42
 
     public String getDate() {
         return date;
@@ -26,5 +27,9 @@ public class TeamMoodDay {
 
     public OneMoodValue[] getValues() {
         return values;
+    }
+
+    public long getParticipationRate() {
+        return participationRate;
     }
 }

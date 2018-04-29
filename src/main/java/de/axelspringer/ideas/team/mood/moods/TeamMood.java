@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import de.axelspringer.ideas.team.mood.TeamMoodWeek;
 import de.axelspringer.ideas.team.mood.letsencrypt.TeamMoodHttpClientFactory;
 import de.axelspringer.ideas.team.mood.moods.entity.OneMoodValue;
-import de.axelspringer.ideas.team.mood.moods.entity.ParticipationResponse;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodDay;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -47,25 +46,6 @@ public class TeamMood {
 
     }
 
-    public Integer loadNumberOfMembers(String teamApiKey) {
-        LOG.info("Loading participation from TeamMood!");
-        try {
-            CloseableHttpClient httpclient = getPreparedClient();
-            HttpGet httpGet = new HttpGet(String.format(URL_TO_PARTICIPATION_WITH_PLACEHOLDER, teamApiKey));
-
-            try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
-                HttpEntity entity = response.getEntity();
-                String resultString = EntityUtils.toString(entity);
-                checkStatusCode(response, resultString);
-
-                return gson.fromJson(resultString, ParticipationResponse.class).activeMembersCount;
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     public Team loadTeamMoodForWeek(String teamApiKey, TeamMoodWeek week) {
         String start = week.startFormattedWithTeamMoodSettings();
         String end = week.endFormattedWithTeamMoodSettings();
@@ -88,7 +68,7 @@ public class TeamMood {
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
                 HttpEntity entity = response.getEntity();
                 String resultString = EntityUtils.toString(entity);
-                checkStatusCode(response, resultString);
+                checkStatusCode(response, resultString, url);
 
                 Team team = gson.fromJson(resultString, Team.class);
                 for (TeamMoodDay day : team.days) {
@@ -102,7 +82,6 @@ public class TeamMood {
                 }
 
                 team.id = teamApiKey;
-                team.numberOfMembers = loadNumberOfMembers(teamApiKey);
 
                 cache.put(url, team);
                 return team;
@@ -120,10 +99,10 @@ public class TeamMood {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(day.nativeDate), ZoneId.of("Europe/Berlin"));
     }
 
-    private void checkStatusCode(CloseableHttpResponse response, String resultString) {
+    private void checkStatusCode(CloseableHttpResponse response, String resultString, String url) {
         if (response.getStatusLine().getStatusCode() > 200) {
-            LOG.warn(resultString);
-            throw new RuntimeException("Could not read answer from TEAM MOOD.");
+            LOG.warn("Check Status Code on '" + url + "' failed, RESULT: " + resultString);
+            throw new RuntimeException("Could not read answer from TEAM MOOD. Status: " + response.getStatusLine());
         }
     }
 }
