@@ -7,7 +7,7 @@
 
 ### Starting the app
 
-* Procfile for easy hosting on Heroku
+* HINT: There is a ``Procfile`` for easy hosting on Heroku, you only need to add the 4 properties at your Heroku-Settings
 * starts locally ``http://localhost:4567``
 > java -jar -Dde.axelspringer.ideas.team.mood.mail.user={USER} -Dde.axelspringer.ideas.team.mood.mail.password={PASSWORD} -Dde.axelspringer.ideas.team.mood.api.keys={KEY}
 
