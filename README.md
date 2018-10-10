@@ -17,12 +17,10 @@
 * ``de.axelspringer.ideas.team.mood.elasticMailApiKey`` The API key of your ElasticMail account
 * ``de.axelspringer.ideas.team.mood.email.addresses`` The e-mail addresses which will receive the summary mail (comma separated)
 * ``de.axelspringer.ideas.team.mood.api.keys`` The TeamMood teams as UUIDs from where the moods should be included in the mail (comma separated)
-* ``de.axelspringer.ideas.team.mood.basicAuthPassword`` The basic auth password. If empty the basic auth will be disabled.
+* ``de.axelspringer.ideas.team.mood.basicAuthPassword`` The basic auth password. If empty the basic auth will be disabled. The username is always **ideas**
 
 Example:
-```
--Dde.axelspringer.ideas.team.mood.api.keys=af186e47-xxx-xxxx-xxxx-77a4fed63a57,01770399-xxx-xxxx-xxxx-c96e0dc90e58,103ceac8-xxx-xxxx-xxxx-f0e912cddaa7 -Dde.axelspringer.ideas.team.mood.elasticMailApiKey=d2ca56f3-xxx-xxxx-xxxx-ef6a24368788 -Dde.axelspringer.ideas.team.mood.email.addresses=hellok@asideas.de
-```
+> -Dde.axelspringer.ideas.team.mood.api.keys=af186e47-xxx-xxxx-xxxx-77a4fed63a57,01770399-xxx-xxxx-xxxx-c96e0dc90e58,103ceac8-xxx-xxxx-xxxx-f0e912cddaa7 -Dde.axelspringer.ideas.team.mood.elasticMailApiKey=d2ca56f3-xxx-xxxx-xxxx-ef6a24368788 -Dde.axelspringer.ideas.team.mood.email.addresses=hellok@asideas.de
 
 ### How to get your TeamMood-API Keys
 
