@@ -1,4 +1,8 @@
-# ideas-teammood
+# ideas-teammood: Weekly TeamMood e-mail
+
+HINT: The e-mails are currently manually triggered over the ui, as our german workers council demands manually scanning all comments before sending such mails.
+
+![01](docs/teammood-cover.png)
 
 ### Prerequisites
 
