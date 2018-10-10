@@ -24,7 +24,7 @@ HINT: The e-mails are currently manually triggered over the ui, as our german wo
 * ``de.axelspringer.ideas.team.mood.basicAuthPassword`` The basic auth password. If empty the basic auth will be disabled. The username is always **ideas**
 
 Example:
-> -Dde.axelspringer.ideas.team.mood.api.keys=af186e47-xxx-xxxx-xxxx-77a4fed63a57,01770399-xxx-xxxx-xxxx-c96e0dc90e58,103ceac8-xxx-xxxx-xxxx-f0e912cddaa7 -Dde.axelspringer.ideas.team.mood.elasticMailApiKey=d2ca56f3-xxx-xxxx-xxxx-ef6a24368788 -Dde.axelspringer.ideas.team.mood.email.addresses=hellok@asideas.de
+> -Dde.axelspringer.ideas.team.mood.api.keys=af186e47-xxx-xxxx-xxxx-77a4fed63a57,01770399-xxx-xxxx-xxxx-c96e0dc90e58,103ceac8-xxx-xxxx-xxxx-f0e912cddaa7 -Dde.axelspringer.ideas.team.mood.elasticMailApiKey=d2ca56f3-xxx-xxxx-xxxx-ef6a24368788 -Dde.axelspringer.ideas.team.mood.email.addresses=hello@asideas.de
 
 ### How to get your TeamMood-API Keys
 
