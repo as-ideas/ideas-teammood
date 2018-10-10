@@ -77,11 +77,7 @@ public class TeamMoodController {
             return new ModelAndView(emailContent, "email.hbs");
         }, engine);
 
-        get("/week/:week/send-all", (request, response) -> {
-            String currentWeek = request.params(":week");
-            sendMailForWeek(teamMoodProperties.getAllEmailAddresses(), currentWeek);
-            return "{}";
-        });
+
     }
 
     private void sendMailForWeek(List<String> addresses, String currentWeek) throws IOException {

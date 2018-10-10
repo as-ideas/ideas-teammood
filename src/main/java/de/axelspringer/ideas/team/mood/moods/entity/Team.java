@@ -44,11 +44,15 @@ public class Team implements Comparable<Team> {
     }
 
     public String getParticipation() {
-        int sum=0;
+        int sum = 0;
         for (TeamMoodDay day : days) {
-           sum+=day.getParticipationRate();
+            sum += day.getParticipationRate();
         }
-        return "" + (sum / days.length) + "%";
+        if (days.length == 0) {
+            return "0%";
+        } else {
+            return "" + (sum / days.length) + "%";
+        }
     }
 
 

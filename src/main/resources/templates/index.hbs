@@ -79,10 +79,6 @@
                 <button type="button" class="btn btn-primary send-mail" onclick="sendMail()">Send Mail for week</button>
             </div>
             <br/>
-            <div class="button-group">
-                <button type="button" class="btn btn-danger send-mail-all" disabled="true" onclick="sendMailToAll()">Send Mail to all</button>
-            </div>
-            <br/>
         </div>
 
         <div class="col-md-9">
@@ -148,31 +144,7 @@
     function sendMail() {
         console.info("SEND!");
         document.querySelector(".send-mail").disabled = true;
-        document.querySelector(".send-mail-all").disabled = false;
         $.get("week/" + selectWeek.value + "/send")
-                .done(function (data) {
-                    console.info("OK");
-                    document.querySelector(".alert-success").classList.remove("hidden");
-                    window.setTimeout(function () {
-                        document.querySelector(".alert-success").classList.add("hidden");
-                    }, 10000);
-                })
-                .fail(function (data) {
-                    console.error("ERROR");
-                    document.querySelector(".alert-danger").classList.remove("hidden");
-                    window.setTimeout(function () {
-                        document.querySelector(".alert-danger").classList.add("hidden");
-                    }, 10000);
-                })
-                .always(function (data) {
-                    document.querySelector(".send-mail").disabled = false;
-                });
-    }
-
-    function sendMailToAll() {
-        console.info("SEND to ALL!");
-        document.querySelector(".send-mail-all").disabled = true;
-        $.get("week/" + selectWeek.value + "/send-all")
                 .done(function (data) {
                     console.info("OK");
                     document.querySelector(".alert-success").classList.remove("hidden");
