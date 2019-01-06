@@ -12,7 +12,7 @@ import java.util.Date;
 public class TeamMoodWeek {
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-    private static final DateTimeFormatter dateTimeFormatter2 = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+    private static final DateTimeFormatter dateTimeFormatter2 = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public static TeamMoodWeek currentWeek() {
         Calendar cal = Calendar.getInstance();

@@ -3,7 +3,7 @@ package de.axelspringer.ideas.team.mood.moods.entity;
 public class OneMoodValue {
 
     public TeamMoodValueType mood;
-    public String comment;
+    public OneMoodComment comment;
     public long nativeDate;
     public String formattedDate;
 
@@ -12,7 +12,7 @@ public class OneMoodValue {
     }
 
     public String getComment() {
-        return comment;
+        return comment.getBody();
     }
 
     public String getHexColor() {

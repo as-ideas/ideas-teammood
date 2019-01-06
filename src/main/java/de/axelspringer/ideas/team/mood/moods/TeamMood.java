@@ -69,22 +69,30 @@ public class TeamMood {
                 HttpEntity entity = response.getEntity();
                 String resultString = EntityUtils.toString(entity);
                 checkStatusCode(response, resultString, url);
+                try {
 
-                Team team = gson.fromJson(resultString, Team.class);
-                for (TeamMoodDay day : team.days) {
-                    LocalDateTime dateTimeOfDay = epochMilisToLocalDateTime(day);
 
-                    for (OneMoodValue value : day.values) {
-                        value.nativeDate = day.nativeDate;
-                        value.formattedDate = WordUtils.capitalizeFully(dateTimeOfDay.getDayOfWeek().name()) + ", " + dateTimeFormatter.format(dateTimeOfDay);
-                        value.comment = StringEscapeUtils.escapeHtml3(value.comment);
+                    Team team = gson.fromJson(resultString, Team.class);
+                    for (TeamMoodDay day : team.days) {
+                        LocalDateTime dateTimeOfDay = epochMilisToLocalDateTime(day);
+
+                        for (OneMoodValue value : day.values) {
+                            value.nativeDate = day.nativeDate;
+                            value.formattedDate = WordUtils.capitalizeFully(dateTimeOfDay.getDayOfWeek().name()) + ", " + dateTimeFormatter.format(dateTimeOfDay);
+                            if (value.comment != null) {
+                                value.comment.body = StringEscapeUtils.escapeHtml3(value.comment.getBody());
+                            }
+                        }
                     }
+
+                    team.id = teamApiKey;
+
+                    cache.put(url, team);
+                    return team;
+                } catch (Exception e) {
+                    LOG.error("Error Parsing JSON:" + resultString);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
-
-                team.id = teamApiKey;
-
-                cache.put(url, team);
-                return team;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
