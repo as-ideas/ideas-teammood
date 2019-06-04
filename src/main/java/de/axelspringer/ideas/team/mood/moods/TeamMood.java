@@ -3,21 +3,26 @@ package de.axelspringer.ideas.team.mood.moods;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
+import de.axelspringer.ideas.team.mood.TeamMoodProperties;
 import de.axelspringer.ideas.team.mood.TeamMoodWeek;
 import de.axelspringer.ideas.team.mood.letsencrypt.TeamMoodHttpClientFactory;
 import de.axelspringer.ideas.team.mood.moods.entity.OneMoodValue;
 import de.axelspringer.ideas.team.mood.moods.entity.Team;
 import de.axelspringer.ideas.team.mood.moods.entity.TeamMoodDay;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,9 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TeamMood {
 
-    private static final String URL_TO_TEAM_MOOD = "https://app.teammood.com/api/%s/moods?start=%s&end=%s";
-    private static final String URL_TO_TEAM_MOOD_WITH_LAST_SEVEN_DAYS_WITH_PLACEHOLDER = "https://app.teammood.com/api/%s/moods?since=7";
-    private static final String URL_TO_PARTICIPATION_WITH_PLACEHOLDER = "https://app.teammood.com/%s/participation";
+    private static final String URL_TO_TEAM_MOOD = "https://app.teammood.com/api/v2/team/moods?start=%s&end=%s";
 
     private final static Logger LOG = LoggerFactory.getLogger(TeamMood.class);
 
@@ -39,19 +42,13 @@ public class TeamMood {
             .expireAfterWrite(1, TimeUnit.HOURS)
             .build();
 
-    public Team loadTeamMoodForLastSevenDays(String teamApiKey) {
-        LOG.info("Loading data from TeamMood!");
-        String url = String.format(URL_TO_TEAM_MOOD_WITH_LAST_SEVEN_DAYS_WITH_PLACEHOLDER, teamApiKey);
-        return getMoodDataFromTeamMood(teamApiKey, url);
-
-    }
 
     public Team loadTeamMoodForWeek(String teamApiKey, TeamMoodWeek week) {
         String start = week.startFormattedWithTeamMoodSettings();
         String end = week.endFormattedWithTeamMoodSettings();
 
         LOG.info("Loading data from TeamMood from '{}' to '{}'!", start, end);
-        String url = String.format(URL_TO_TEAM_MOOD, teamApiKey, start, end);
+        String url = String.format(URL_TO_TEAM_MOOD, start, end);
         return getMoodDataFromTeamMood(teamApiKey, url);
     }
 
@@ -63,7 +60,7 @@ public class TeamMood {
 
         try {
             CloseableHttpClient httpclient = getPreparedClient();
-            HttpGet httpGet = new HttpGet(url);
+            HttpUriRequest httpGet = buildRequest(url, getAuth());
 
             try (CloseableHttpResponse response = httpclient.execute(httpGet)) {
                 HttpEntity entity = response.getEntity();
@@ -97,6 +94,17 @@ public class TeamMood {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+    private HttpUriRequest buildRequest(String url, String basicAuth) {
+        return RequestBuilder.get()
+                .setUri(url)
+                .setHeader(HttpHeaders.AUTHORIZATION, "Basic " + basicAuth)
+                .build();
+    }
+
+    private String getAuth() {
+        byte[] credentials = Base64.encodeBase64((TeamMoodProperties.INSTANCE.getTeamMoodAPIUsername() + ":" + TeamMoodProperties.INSTANCE.getTeamMoodAPIPassword()).getBytes(StandardCharsets.UTF_8));
+        return new String(credentials, StandardCharsets.UTF_8);
     }
 
     private CloseableHttpClient getPreparedClient() {

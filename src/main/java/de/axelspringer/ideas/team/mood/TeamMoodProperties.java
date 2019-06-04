@@ -9,6 +9,8 @@ public class TeamMoodProperties {
 
     private String elasticMailApiKey;
     private String basicAuthPassword;
+    private String teamMoodAPIUsername;
+    private String teamMoodAPIPassword;
     private List<String> teamApiKeys;
     private List<String> emails;
 
@@ -39,6 +41,20 @@ public class TeamMoodProperties {
             elasticMailApiKey = getProperty("de.axelspringer.ideas.team.mood.elasticMailApiKey");
         }
         return elasticMailApiKey;
+    }
+
+    public String getTeamMoodAPIUsername() {
+        if (teamMoodAPIUsername == null) {
+            teamMoodAPIUsername = getProperty("de.axelspringer.ideas.team.mood.apiUsername");
+        }
+        return teamMoodAPIUsername;
+    }
+
+    public String getTeamMoodAPIPassword() {
+        if (teamMoodAPIPassword == null) {
+            teamMoodAPIPassword = getProperty("de.axelspringer.ideas.team.mood.apiPassword");
+        }
+        return teamMoodAPIPassword;
     }
 
     private String getProperty(String s) {
